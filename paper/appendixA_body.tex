@@ -1,0 +1,572 @@
+%=======================================================================
+%  附录 A  完整代数推导
+%=======================================================================
+\chapter{受迫 Kuramoto 模型的完整推导}
+\label{app:derivation}
+
+本附录给出第~\ref{chap:model} 章中所有非平凡代数步骤的完整推导，以便读者独立
+复核。所有结果均可用符号计算软件逐行验证；配套的验证脚本见开源仓库
+\texttt{tests/test\_analytic.py}。
+
+%-----------------------------------------------------------------------
+\section{从 OA 方程到旋转参考系}
+\label{app:rotating}
+
+起点为 Ott--Antonsen 方程 \cref{eq:oa}，
+%
+\begin{equation}
+\dot z=(\ii\wbar-\gamma)z+\tfrac12\bigl(H-H^{*}z^{2}\bigr),
+\end{equation}
+%
+其中等效驱动场为 \cref{eq:Hfield}：$H=Kz+Fe^{\ii\Om t}$，故
+$H^{*}=Kz^{*}+Fe^{-\ii\Om t}$。代入：
+%
+\begin{align}
+\dot z
+&=(\ii\wbar-\gamma)z
+ +\frac12\Bigl[Kz+Fe^{\ii\Om t}-\bigl(Kz^{*}+Fe^{-\ii\Om t}\bigr)z^{2}\Bigr]
+ \notag\\
+&=(\ii\wbar-\gamma)z
+ +\frac{K}{2}\bigl(z-|z|^{2}z\bigr)
+ +\frac{F}{2}\bigl(e^{\ii\Om t}-e^{-\ii\Om t}z^{2}\bigr),
+ \label{eq:app-zdot}
+\end{align}
+%
+其中用到 $z^{*}z^{2}=|z|^{2}z$。
+
+现引入旋转系变量
+%
+\begin{equation}
+w=z\,e^{-\ii\Om t}
+\quad\Longleftrightarrow\quad
+z=w\,e^{\ii\Om t},
+\qquad
+\dot z=\bigl(\dot w+\ii\Om w\bigr)e^{\ii\Om t}.
+\end{equation}
+%
+逐项代入 \cref{eq:app-zdot}，注意 $|z|^{2}=|w|^{2}$（模不变）以及
+%
+\begin{equation}
+e^{-\ii\Om t}z^{2}=e^{-\ii\Om t}\cdot w^{2}e^{2\ii\Om t}=w^{2}e^{\ii\Om t},
+\end{equation}
+%
+得
+%
+\begin{equation}
+\bigl(\dot w+\ii\Om w\bigr)e^{\ii\Om t}
+=(\ii\wbar-\gamma)w\,e^{\ii\Om t}
++\frac{K}{2}\bigl(w-|w|^{2}w\bigr)e^{\ii\Om t}
++\frac{F}{2}\bigl(1-w^{2}\bigr)e^{\ii\Om t}.
+\end{equation}
+%
+两边除以 $e^{\ii\Om t}$ 并把 $\ii\Om w$ 移到右侧：
+%
+\begin{equation}
+\dot w=\bigl[\ii(\wbar-\Om)-\gamma\bigr]w
++\frac{K}{2}\bigl(w-|w|^{2}w\bigr)
++\frac{F}{2}\bigl(1-w^{2}\bigr),
+\end{equation}
+%
+即 \cref{eq:rot}，其中 $\Delta=\wbar-\Om$。\hfill$\blacksquare$
+
+\begin{remark}
+关键点在于旋转变换把\emph{显式时间依赖}完全消去：驱动项 $Fe^{\ii\Om t}$ 变为
+常数 $F$，$e^{-\ii\Om t}z^2$ 项变为 $w^2$。这使系统成为\emph{自治}二维系统，
+从而其全部长时行为可由不动点与极限环分类穷尽——这是 \citet{Childs2008} 能够
+给出完整分岔图的前提。
+\end{remark}
+
+%-----------------------------------------------------------------------
+\section{极坐标分解}
+\label{app:polar}
+
+令 $w=\rho e^{\ii\Phi}$（$\rho\ge0$），则
+%
+\begin{equation}
+\dot w=\bigl(\dot\rho+\ii\rho\dot\Phi\bigr)e^{\ii\Phi}.
+\end{equation}
+%
+将 \cref{eq:rot} 两边乘以 $e^{-\ii\Phi}$：
+%
+\begin{equation}
+\dot\rho+\ii\rho\dot\Phi
+=(\ii\Delta-\gamma)\rho
++\frac{K}{2}\bigl(\rho-\rho^{3}\bigr)
++\frac{F}{2}\bigl(e^{-\ii\Phi}-\rho^{2}e^{\ii\Phi}\bigr).
+\end{equation}
+%
+展开最后一项：
+%
+\begin{align}
+e^{-\ii\Phi}-\rho^{2}e^{\ii\Phi}
+&=(\cos\Phi-\ii\sin\Phi)-\rho^{2}(\cos\Phi+\ii\sin\Phi)\notag\\
+&=(1-\rho^{2})\cos\Phi-\ii\,(1+\rho^{2})\sin\Phi .
+\label{eq:app-expand}
+\end{align}
+%
+分离实虚部：
+
+\paragraph{实部.}
+\begin{equation}
+\dot\rho=-\gamma\rho+\frac{K}{2}\rho(1-\rho^{2})
+         +\frac{F}{2}(1-\rho^{2})\cos\Phi ,
+\end{equation}
+即 \cref{eq:polar-a}。
+
+\paragraph{虚部.}
+\begin{equation}
+\rho\dot\Phi=\Delta\rho-\frac{F}{2}(1+\rho^{2})\sin\Phi
+\quad\Longrightarrow\quad
+\dot\Phi=\Delta-\frac{F}{2}\frac{1+\rho^{2}}{\rho}\sin\Phi
+        =\Delta-\frac{F}{2}\left(\rho+\frac{1}{\rho}\right)\sin\Phi ,
+\end{equation}
+即 \cref{eq:polar-b}。\hfill$\blacksquare$
+
+\begin{remark}
+注意 \cref{eq:app-expand} 中 $(1-\rho^2)$ 与 $(1+\rho^2)$ 的\emph{符号不对称}：
+振幅方程含 $(1-\rho^2)$，在 $\rho\to1$ 时驱动对振幅失效（已完全同步，无可再
+增）；相位方程含 $(1+\rho^2)$，恒不为零。这一结构差异是 \cref{eq:main} 中两项
+分母不同的根源，也是区制 II 中 $\Feff$ 出现 $\rho_0+1/\rho_0$ 组合的来源。
+\end{remark}
+
+%-----------------------------------------------------------------------
+\section{主方程的导出}
+\label{app:main}
+
+锁定态为 \cref{eq:polar} 的不动点，即 $\dot\rho=\dot\Phi=0$。
+
+由 $\dot\Phi=0$：
+%
+\begin{equation}
+\Delta=\frac{F}{2}\frac{1+\rho^{2}}{\rho}\sin\Phi
+\quad\Longrightarrow\quad
+\sin\Phi=\frac{2\Delta\rho}{F(1+\rho^{2})} .
+\label{eq:app-sin}
+\end{equation}
+
+由 $\dot\rho=0$：
+%
+\begin{equation}
+\frac{F}{2}(1-\rho^{2})\cos\Phi=\gamma\rho-\frac{K}{2}\rho(1-\rho^{2})
+=\frac{\rho}{2}\bigl[2\gamma-K(1-\rho^{2})\bigr],
+\end{equation}
+%
+故
+%
+\begin{equation}
+\cos\Phi=\frac{\rho\bigl[2\gamma-K(1-\rho^{2})\bigr]}{F(1-\rho^{2})} .
+\label{eq:app-cos}
+\end{equation}
+%
+\cref{eq:app-sin,eq:app-cos} 合为 \cref{eq:sincos}。代入
+$\sin^{2}\Phi+\cos^{2}\Phi=1$：
+%
+\begin{equation}
+\frac{4\Delta^{2}\rho^{2}}{F^{2}(1+\rho^{2})^{2}}
++\frac{\rho^{2}\bigl[2\gamma-K(1-\rho^{2})\bigr]^{2}}{F^{2}(1-\rho^{2})^{2}}=1 ,
+\end{equation}
+%
+两边乘 $F^{2}$ 即得主方程 \cref{eq:main}。\hfill$\blacksquare$
+
+\paragraph{关于解的存在性.}
+\cref{eq:main} 左端在 $\rho\to1^{-}$ 时因 $(1-\rho^2)^{-2}$ 发散（除非
+$2\gamma-K(1-\rho^2)\to0$ 同时发生），在 $\rho\to0^{+}$ 时趋于 $0$。故对任意
+$F>0$ 至少存在一个根；根的个数与稳定性需结合 \cref{rem:boundary} 所述的完整
+分岔结构判断，不可仅由单调性推断。
+
+%-----------------------------------------------------------------------
+\section{区制 I 的线性化与调谐曲线宽度}
+\label{app:regimeI}
+
+\paragraph{线性化.}
+设 $\rho\ll1$。则 $(1+\rho^{2})^{2}=1+O(\rho^{2})$、
+$(1-\rho^{2})^{2}=1+O(\rho^{2})$、$K(1-\rho^{2})=K+O(\rho^{2})$。保留最低阶，
+\cref{eq:main} 化为
+%
+\begin{equation}
+\rho^{2}\bigl[4\Delta^{2}+(2\gamma-K)^{2}\bigr]=F^{2}
+\quad\Longrightarrow\quad
+\rho=\frac{F}{\sqrt{A^{2}+4\Delta^{2}}},
+\qquad A\equiv2\gamma-K .
+\end{equation}
+
+\paragraph{自洽条件.}
+要求 $\rho\ll1$，在最不利的 $\Delta=0$ 处给出
+%
+\begin{equation}
+\keyeq{F\ll A}
+\end{equation}
+%
+这是区制 I 的定量适用域。注意 $A>0$ 等价于 $K<2\gamma=\Kc$，即亚临界条件。
+
+\paragraph{半高半宽.}
+功率 $\rho^{2}=F^{2}/(A^{2}+4\Delta^{2})$ 的峰值为 $F^{2}/A^{2}$（在
+$\Delta=0$）。半高处
+%
+\begin{equation}
+\frac{F^{2}}{A^{2}+4\Delta^{2}}=\frac{1}{2}\frac{F^{2}}{A^{2}}
+\;\Longrightarrow\;
+A^{2}+4\Delta^{2}=2A^{2}
+\;\Longrightarrow\;
+|\Delta|=\frac{A}{2}\equiv W .
+\end{equation}
+%
+在 $|\Delta|=W$ 处，$\rho=F/\sqrt{A^{2}+A^{2}}=\rho_{\max}/\sqrt{2}$，故 $W$
+同时是 $\rho$ 的 $1/\sqrt2$ 半宽——与正文 \cref{eq:three} 的表述一致。
+
+\paragraph{守恒关系.}
+\begin{equation}
+W\cdot\rho_{\max}=\frac{A}{2}\cdot\frac{F}{A}=\frac{F}{2},
+\end{equation}
+%
+即 \cref{eq:conserv}。该关系独立于 $\gamma$ 与 $K$ 的具体取值，仅依赖二者
+通过 $A$ 的组合——这正是 \cref{eq:ident} 中 $A$ 为可辨识量的直接体现。
+\hfill$\blacksquare$
+
+%-----------------------------------------------------------------------
+\section{区制 II 的 Adler 约化}
+\label{app:regimeII}
+
+设 $K>\Kc$ 且驱动弱，使 $\rho$ 在整个刺激过程中近似保持其自发值
+$\rho_{0}=\sqrt{1-2\gamma/K}$。此时 \cref{eq:polar-a} 近似满足
+（$\dot\rho\approx0$ 由 $\rho_0$ 的定义保证，$F$ 的修正为高阶），动力学退化为
+\cref{eq:polar-b} 的单变量方程：
+%
+\begin{equation}
+\dot\Phi=\Delta-\Feff\sin\Phi ,
+\qquad
+\Feff=\frac{F}{2}\left(\rho_{0}+\frac{1}{\rho_{0}}\right).
+\end{equation}
+%
+这与 \cref{eq:adler} 形式相同，故锁定条件直接由 \cref{eq:lock} 给出：
+%
+\begin{equation}
+|\Delta|\le\Feff=\frac{F}{2}\left(\rho_{0}+\frac{1}{\rho_{0}}\right),
+\end{equation}
+%
+即 \cref{eq:threshold}。\hfill$\blacksquare$
+
+\paragraph{两点注意.}
+\begin{enumerate}[leftmargin=2.2em,itemsep=2pt]
+\item 由 AM--GM 不等式，$\rho_{0}+1/\rho_{0}\ge2$，等号在 $\rho_{0}=1$ 取到。
+      故 $\Feff\ge F$：\emph{自发同步总是放大集体对外部驱动的相位敏感度}。
+      直观解释：同步群体作为单一宏观振子响应驱动，其有效耦合大于单个振子。
+\item $\rho_{0}\to0^{+}$（即 $K\to\Kc^{+}$）时 $\Feff\to\infty$。这\textbf{不
+      是}物理发散，而是 $\rho\approx\rho_0$ 固定近似失效的信号——$\rho_0$
+      本身趋于零时，驱动对振幅的相对影响不再可忽略。此区域必须回到
+      \cref{eq:main} 数值求解（\cref{rem:nocritdiv}）。
+\end{enumerate}
+
+%-----------------------------------------------------------------------
+\section{噪声：临界耦合的精确插值}
+\label{app:noise}
+
+考虑含噪声、含频率异质性的 Kuramoto 模型 \cref{eq:micro}。非相干态
+($\rho=0$) 的线性稳定性由如下特征方程决定（标准 Fokker--Planck 线性化
+结果，见 \citealp{Strogatz2000}）：
+%
+\begin{equation}
+\frac{K}{2}\int_{-\infty}^{\infty}
+\frac{g(\omega)\,\dd\omega}{D+\ii(\omega-\wbar)}=1 .
+\label{eq:app-stab}
+\end{equation}
+
+对洛伦兹分布 \cref{eq:lorentz}，令 $u=\omega-\wbar$：
+%
+\begin{equation}
+\int_{-\infty}^{\infty}\frac{1}{D+\ii u}\cdot
+\frac{\gamma/\pi}{u^{2}+\gamma^{2}}\,\dd u .
+\end{equation}
+%
+被积函数在上半平面有单极点 $u=\ii\gamma$（来自洛伦兹）；$1/(D+\ii u)$ 的极点
+位于 $u=\ii D$，也在上半平面。但注意
+$\frac{1}{D+\ii u}=\frac{1}{\ii}\cdot\frac{1}{u-\ii D}$，故在上半平面沿大
+半圆闭合，由留数定理
+%
+\begin{align}
+\oint &= 2\pi\ii\left[
+\underset{u=\ii\gamma}{\mathrm{Res}}+\underset{u=\ii D}{\mathrm{Res}}\right].
+\end{align}
+%
+直接计算（或更简便地，利用洛伦兹分布的特征函数
+$\int g(\omega)e^{\ii s u}\dd u=e^{-\gamma|s|}$ 与
+$\frac{1}{D+\ii u}=\int_{0}^{\infty}e^{-(D+\ii u)s}\dd s$ 交换积分次序）：
+%
+\begin{equation}
+\int_{0}^{\infty}e^{-Ds}\left[\int g\,e^{-\ii u s}\dd u\right]\dd s
+=\int_{0}^{\infty}e^{-Ds}e^{-\gamma s}\,\dd s
+=\frac{1}{D+\gamma} .
+\end{equation}
+%
+代回 \cref{eq:app-stab}：
+%
+\begin{equation}
+\keyeq{\Kc=2(\gamma+D)}
+\end{equation}
+%
+\hfill$\blacksquare$
+
+\begin{remark}[\cref{eq:geff} 的地位]\label{rem:geffstatus}
+上式表明 $\geff=\gamma+D$ 在\emph{非相干态线性稳定性层面是精确的}——这比
+\cref{rem:Dposition} 的启发式论证强得多。但它\textbf{不}保证在完全锁定态
+（$\rho$ 接近 $1$）下仍精确：那里噪声的作用不再是简单展宽，因为
+Fokker--Planck 方程的非线性项开始主导。故正文声明的适用域“$\rho\ll1$ 的线性
+响应区”是必要的。定量偏差应用 \citet{Tyulkina2018} 的圆累积量方法或直接
+SDE 模拟评估。
+\end{remark}
+
+%-----------------------------------------------------------------------
+\section{最优频率偏移的推导与数值估计}
+\label{app:offset}
+
+设传输函数 $\Xi(\Om)$ 描述从刺激器设定频率到皮层有效驱动强度的频率依赖
+衰减，则
+%
+\begin{equation}
+\rho(\Om)=\frac{F_{0}\,\Xi(\Om)}{\sqrt{A^{2}+4(\wbar-\Om)^{2}}} .
+\end{equation}
+%
+取对数：
+%
+\begin{equation}
+\ln\rho=\ln F_{0}+\ln\Xi(\Om)
+-\tfrac12\ln\!\bigl[A^{2}+4(\wbar-\Om)^{2}\bigr].
+\end{equation}
+%
+求导（注意 $\dd(\wbar-\Om)/\dd\Om=-1$）：
+%
+\begin{equation}
+\frac{\dd\ln\rho}{\dd\Om}
+=\frac{\Xi'}{\Xi}
+-\frac12\cdot\frac{-8(\wbar-\Om)}{A^{2}+4(\wbar-\Om)^{2}}
+=\frac{\Xi'}{\Xi}+\frac{4(\wbar-\Om)}{A^{2}+4(\wbar-\Om)^{2}} .
+\end{equation}
+%
+令 $u=\Om-\wbar$（故 $\wbar-\Om=-u$）并置零：
+%
+\begin{equation}
+\frac{\Xi'}{\Xi}-\frac{4u}{A^{2}+4u^{2}}=0 .
+\end{equation}
+%
+对小偏移 $|u|\ll A/2$ 线性化（分母取 $A^{2}$）：
+%
+\begin{equation}
+u\simeq\frac{A^{2}}{4}\cdot\frac{\Xi'}{\Xi}\bigg|_{\wbar},
+\end{equation}
+%
+即 \cref{eq:offset}。\hfill$\blacksquare$
+
+\paragraph{数值估计.}
+取一阶低通 $\Xi(f)=\bigl[1+(f/f_{c})^{2}\bigr]^{-1/2}$，转折频率
+$f_{c}=25\,$Hz。则
+%
+\begin{equation}
+\frac{\Xi'}{\Xi}=-\frac{f/f_{c}^{2}}{1+(f/f_{c})^{2}}
+\;\xrightarrow[\;f=10\,\mathrm{Hz}\;]{}\;
+-\frac{10/625}{1+0.16}=-0.0138\ \mathrm{Hz^{-1}} .
+\end{equation}
+%
+代入 \cref{eq:offset}，见 \cref{tab:offset}。
+
+\begin{table}[htbp]
+\centering
+\caption{最优频率偏移的数值估计（一阶低通，$f_c=25\,$Hz）}
+\label{tab:offset}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+$W$ (Hz) & $A=2W$ (Hz) & $A^{2}/4$ & 偏移 $|u|$ (Hz) \\
+\midrule
+$0.5$ & $1.0$ & $0.25$ & $0.003$ \\
+$1.0$ & $2.0$ & $1.00$ & $0.014$ \\
+$2.0$ & $4.0$ & $4.00$ & $0.055$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+结论：偏移量在 $10^{-3}$--$10^{-1}\,$Hz 量级，远小于 EEG 峰频估计的典型精度
+$\pm0.2$--$0.5\,$Hz。故 \cref{rem:offsetsmall} 的实用结论成立。
+
+%-----------------------------------------------------------------------
+\section{外周抖动的低通因子与量级估计}
+\label{app:jitter}
+
+设脉冲到达时刻为 $t_{n}=nT+\epsilon_{n}$，抖动
+$\epsilon_{n}\sim\mathcal{N}(0,\sigma_{\tau}^{2})$ 独立同分布。第 $m=1$ 次
+傅里叶分量的期望振幅按高斯特征函数衰减：
+%
+\begin{equation}
+\bigl\langle e^{-\ii\Om\epsilon}\bigr\rangle
+=\exp\!\left(-\frac{\sigma_{\tau}^{2}\Om^{2}}{2}\right)
+\;\equiv\;\Xi_{\mathrm{jitter}} .
+\end{equation}
+
+\paragraph{在 $10\,$Hz 处的量级.}
+$\Om=2\pi\times10=62.83\,\mathrm{rad\,s^{-1}}$，取上界
+$\sigma_{\tau}=3\,$ms：
+%
+\begin{equation}
+\frac{\sigma_{\tau}^{2}\Om^{2}}{2}
+=\frac{(3\times10^{-3})^{2}\times(62.83)^{2}}{2}=0.0178 ,
+\qquad
+\Xi_{\mathrm{jitter}}=e^{-0.0178}=0.982 .
+\end{equation}
+%
+即约 $1.8\%$ 衰减。
+
+\paragraph{产生 $20\%$ 衰减所需的抖动.}
+令 $\Xi_{\mathrm{jitter}}=0.8$，则 $\sigma_{\tau}^{2}\Om^{2}/2=0.223$，
+%
+\begin{equation}
+\sigma_{\tau}=\frac{\sqrt{2\times0.223}}{62.83}=1.06\times10^{-2}\,\mathrm{s}
+=10.6\,\mathrm{ms} .
+\end{equation}
+%
+这远超外周神经传导抖动的生理范围。\textbf{结论：该机制在 mu 波段可忽略}，
+仅在 gamma 波段（$\Om$ 大 $4$--$5$ 倍，指数中因子大 $16$--$25$ 倍）方案中
+才需纳入。这是一个有信息量的负面结果：低频段外周通路是“干净”的传输
+信道。\hfill$\blacksquare$
+
+%-----------------------------------------------------------------------
+\section{Rice 越阈公式到唯象门控}
+\label{app:rice}
+
+对零均值平稳高斯过程 $m(t)$，方差 $\sigma_{m}^{2}$，其对水平 $\Theta$ 的
+向上穿越率由 Rice 公式给出：
+%
+\begin{equation}
+\lambda(\Theta)=\frac{1}{2\pi}\frac{\sigma_{\dot m}}{\sigma_{m}}
+\exp\!\left(-\frac{\Theta^{2}}{2\sigma_{m}^{2}}\right)
+\equiv\nu_{0}\exp\!\left(-\frac{\Theta^{2}}{2\sigma_{m}^{2}}\right),
+\end{equation}
+%
+即 \cref{eq:rice}。代入门控形式 \cref{eq:thetaeff}，$\Thf=\Theta_{0}+a\rho$：
+%
+\begin{align}
+-\frac{\Thf^{2}}{2\sigma_{m}^{2}}
+&=-\frac{\Theta_{0}^{2}+2a\Theta_{0}\rho+a^{2}\rho^{2}}{2\sigma_{m}^{2}}\notag\\
+&=-\frac{\Theta_{0}^{2}}{2\sigma_{m}^{2}}
+  -\frac{a\Theta_{0}}{\sigma_{m}^{2}}\rho
+  -\frac{a^{2}}{2\sigma_{m}^{2}}\rho^{2} .
+\end{align}
+%
+于是
+%
+\begin{equation}
+\lambda=\underbrace{\nu_{0}e^{-\Theta_{0}^{2}/2\sigma_{m}^{2}}}_{\lambda_{0}}
+\exp\!\left[-\underbrace{\frac{a\Theta_{0}}{\sigma_{m}^{2}}}_{\beta}\rho
+            -\frac{a^{2}}{2\sigma_{m}^{2}}\rho^{2}\right].
+\label{eq:app-lambda-full}
+\end{equation}
+%
+截断二阶项即得 \cref{eq:lambda}。\hfill$\blacksquare$
+
+\paragraph{二阶偏差的量级.}
+二阶项相对一阶项之比为
+%
+\begin{equation}
+\frac{a^{2}\rho^{2}/2\sigma_{m}^{2}}{a\Theta_{0}\rho/\sigma_{m}^{2}}
+=\frac{a\rho}{2\Theta_{0}} .
+\end{equation}
+%
+故当 mu 门控引起的阈值抬升 $a\rho$ 远小于基线阈值 $\Theta_{0}$ 时，一阶截断
+成立。若实测剂量--反应曲线\emph{陡于}指数，即为二阶项的证据，可用于独立
+估计 $a/\Theta_{0}$。
+
+%-----------------------------------------------------------------------
+\section{可辨识性：Fisher 信息矩阵的零方向}
+\label{app:ident}
+
+由 \cref{eq:Ei}，
+%
+\begin{equation}
+E_i(\Om)=1-\exp\!\left[-\frac{B_i}{\sqrt{A_i^{2}+4(\wbar_i-\Om)^{2}}}\right],
+\qquad
+A_i=2\gamma_{\mathrm{eff},i}-K_i,\quad B_i=\beta_iF_i .
+\end{equation}
+
+\paragraph{$(\gamma_{\mathrm{eff}},K)$ 方向.}
+由链式法则，
+%
+\begin{equation}
+\frac{\partial E}{\partial\gamma_{\mathrm{eff}}}
+=\frac{\partial E}{\partial A}\cdot
+ \frac{\partial A}{\partial\gamma_{\mathrm{eff}}}
+=2\,\frac{\partial E}{\partial A},
+\qquad
+\frac{\partial E}{\partial K}
+=\frac{\partial E}{\partial A}\cdot\frac{\partial A}{\partial K}
+=-\frac{\partial E}{\partial A} .
+\end{equation}
+%
+故存在参数扰动方向
+%
+\begin{equation}
+\bigl(\delta\gamma_{\mathrm{eff}},\,\delta K\bigr)\propto(1,\,2)
+\quad\Longrightarrow\quad
+\delta E=\frac{\partial E}{\partial\gamma_{\mathrm{eff}}}\cdot1
+        +\frac{\partial E}{\partial K}\cdot2
+        =2\frac{\partial E}{\partial A}-2\frac{\partial E}{\partial A}=0 ,
+\end{equation}
+%
+即沿 $(1,2)$ 方向移动参数不改变任何观测量。Fisher 信息矩阵在该方向有严格
+零特征值——$\gamma_{\mathrm{eff}}$ 与 $K$ \textbf{单独不可辨识}，仅组合
+$A$ 可辨识。
+
+\paragraph{$(\beta,F)$ 方向.}
+$B=\beta F$ 为乘积，故 $\delta\ln B=\delta\ln\beta+\delta\ln F$。沿
+%
+\begin{equation}
+\frac{\delta\beta}{\beta}=-\frac{\delta F}{F}
+\end{equation}
+%
+移动同样不改变 $B$，故为第二个零方向。
+
+\paragraph{结论.}
+9 维参数空间在区制 I 下有效维数为 $3$，可辨识坐标即
+\cref{eq:ident} 的 $\Theta_i=\{\wbar_i,A_i,B_i\}$。这不是模型缺陷，而是
+\emph{正确识别了问题的内在自由度}：拟合应直接以 $(\wbar,A,B)$ 为参数，而非
+在 9 维空间中做带正则化的病态优化。\hfill$\blacksquare$
+
+\begin{remark}[对超临界区的补充]
+区制 II 下 $\rho_{0}=\sqrt{1-2\gamma/K}$ 依赖 $\gamma/K$ 之\emph{比}而非差，
+故该区制中可辨识组合与区制 I 不同。这意味着：\textbf{若能在同一被试上同时
+测得亚临界型与超临界型响应特征，则 $\gamma$ 与 $K$ 可分别确定}。这为设计
+参数分离实验提供了原则性依据。
+\end{remark}
+
+%-----------------------------------------------------------------------
+\section{次谐波判别的候选实验设计}
+\label{app:subharm}
+
+本节给出 \cref{rem:onset} 所要求的、能把真次谐波锁定与起始瞬变／小波泄漏
+区分开的实验设计要点。
+
+\paragraph{混淆源清单.}
+\begin{enumerate}[leftmargin=2.2em,itemsep=2pt]
+\item \textbf{起始瞬变}：$1\,$s 脉冲串的 onset 为宽带事件，在 CWT 中沿低频
+      展布，可产生虚假的 $\Om/2$ 功率。
+\item \textbf{窗宽泄漏}：$1\,$s 矩形窗的频率分辨率约 $1\,$Hz；小波在低频端
+      时间--频率权衡使 $5\,$Hz 附近估计方差大。
+\item \textbf{包络周期}：$1\,$s on $/\,5\,$s off 的重复周期为 $1/6\,$Hz，其
+      谐波族可与低频成分混淆。
+\item \textbf{试次交替伪影}：若试次条件交替呈现，交替周期的一半可产生伪
+      次谐波。
+\end{enumerate}
+
+\paragraph{判别设计.}
+\begin{enumerate}[leftmargin=2.2em,itemsep=2pt]
+\item \textbf{稳态段分析}：采用 $\ge5\,$s 连续刺激，剔除起始与结束各
+      $500\,$ms，仅分析稳态段。真锁定应在稳态段持续存在；瞬变不应。
+\item \textbf{相位一致性而非功率}：真 $\Om/2$ 锁定要求相邻两个刺激周期的
+      响应相位\emph{交替}（周期倍化的定义特征）。计算 $\Om/2$ 处的
+      试次间相位一致性并检验其与刺激相位的固定关系；瞬变无此结构。
+\item \textbf{频率扫描}：若为真次谐波 tongue，其应随 $\Om$ 移动并保持
+      $\Om/2$ 关系；若为伪影，则锚定在固定频率。
+\item \textbf{振幅阈值}：高阶锁定的 tongue 通常比 $1{:}1$ 窄且需更高驱动。
+      预测 $\Om/2$ 响应有\emph{强度阈值}，而线性瞬变随强度线性增长。
+\end{enumerate}
+
+\paragraph{判据.}
+仅当 (1)(2)(3) 同时满足时，方可判定为非线性锁定证据。任一不满足，应归因于
+\cref{rem:onset} 所述的平庸解释。

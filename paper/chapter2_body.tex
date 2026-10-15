@@ -1,0 +1,949 @@
+%=======================================================================
+%  第 2 章  受迫耦合振子模型
+%  可独立 \input 进任意手稿。依赖：amsmath, booktabs, tabularx,
+%  cleveref, natbib，以及 main.tex 中定义的记号宏。
+%=======================================================================
+\chapter{受迫耦合振子模型：从带动假设到个体化最优频率}
+\label{chap:model}
+
+%-----------------------------------------------------------------------
+\section{本章目标与逻辑路线}
+\label{sec:roadmap}
+
+第~1 章确立了经验事实：固定 $10\,$Hz 的节律性正中神经刺激（rhythmic median
+nerve stimulation, rMNS）在双盲假刺激对照试验中显著降低抽动严重度——活跃组
+Yale 全球抽动严重度量表总分（\YGTSS-TTSS）平均下降 $7.13$ 分，假刺激组
+$2.13$ 分，等待组 $2.26$ 分，效应量 $0.5$，$p=0.02$；应答率 $59\%$
+对 $33\%$~\citep{Maiquez2023}。但\emph{机制未定}：独立复现研究显示节律性与
+非节律性刺激的疗效无显著差异，其作者明确结论为脑电带动假设无法解释该
+疗效~\citep{Iverson2023a}。
+
+本章不预设带动假设为真。本章的任务是：\textbf{把带动假设写成一个封闭的动力学
+模型，推导它的必然推论，使其成为可判伪的对象}。逻辑路线为
+%
+\begin{equation*}
+\text{生理约束}\;\longrightarrow\;\text{相位约化}\;\longrightarrow\;
+\text{受迫 Kuramoto}\;\longrightarrow\;\text{OA 精确降维}\;\longrightarrow\;
+\rho^{*}(\Om)\;\longrightarrow\;E(\Om)\;\longrightarrow\;\text{可判伪预测}.
+\end{equation*}
+%
+每一步的近似条件与适用域都在该步给出；模型解释不了的现象集中列于
+\cref{sec:boundary}。完整代数推导见\cref{app:derivation}。
+
+%-----------------------------------------------------------------------
+\section{三个可分离的命题}
+\label{sec:hypotheses}
+
+带动假设的口语表述（“$10\,$Hz 刺激拉动 mu 节律，增强皮层抑制，从而减少
+抽动”）包含三个逻辑上独立、可分别检验的命题。
+
+\begin{hypo}[锁定命题]\label{hyp:H1}
+感觉运动 mu 节律可近似为一群弱耦合极限环振子的集体行为；rMNS 构成外部周期
+驱动。集体锁定程度由驱动强度、群体异质性、内部耦合与\emph{去谐量}
+$\Delta=\wbar-\Om$ 共同决定。
+\end{hypo}
+
+\begin{hypo}[门控命题]\label{hyp:H2}
+抽动的瞬时发生率是 mu 相干程度的单调递减函数。
+\end{hypo}
+
+\begin{hypo}[个体化命题]\label{hyp:H3}
+存在个体依赖的最优刺激频率 $\Ostar_i$；固定频率方案对
+$|\wbar_i-\Om_{\mathrm{fix}}|$ 较大的个体系统性失效。
+\end{hypo}
+
+\noindent\textbf{关键结构.}
+\cref{hyp:H3} 不是附加假设，而是 \cref{hyp:H1} 与 \cref{hyp:H2} 的\emph{演绎
+推论}。这一点决定了本章的全部价值：
+%
+\begin{quote}
+若带动假设成立，频率个体化不是可选的工程优化，而是逻辑必然。
+反之，若实测疗效对刺激频率不敏感，则 \cref{hyp:H1} 与 \cref{hyp:H2}
+中至少一者为假。
+\end{quote}
+%
+因此对 \cref{hyp:H3} 的检验同时是对带动假设本身的检验。这是本模型区别于
+“给既有疗法套一层数学包装”的根本之处。
+
+%-----------------------------------------------------------------------
+\section{相位约化的合法性}
+\label{sec:reduction}
+
+在写下方程之前必须交代三个约化步骤，否则模型的适用范围不清。
+
+\paragraph{步骤 1：从神经元到振子群.}
+感觉运动皮层 mu 节律（$8$–$13\,$Hz）是同步化突触后电位求和的宏观表现。将
+参与该节律的局部神经元集团粗粒化为 $N$ 个“振子单元”，每单元有自身固有频率
+$\omega_i$。代价是丢弃单神经元放电细节，保留集体相位信息——而
+EEG/MEG 测量的恰恰是集体量。
+
+\paragraph{步骤 2：从极限环到相位.}
+若各单元处于稳定极限环上且驱动足够弱（不足以显著改变振幅），则可作相位约化，
+状态由单一相位变量 $\theta_i$ 描述。\textbf{这是本模型最强的一个近似}，其代价
+见 \cref{sec:boundary} 第 (2) 条（真实 mu 是爆发式而非持续振荡）。
+
+\paragraph{步骤 3：耦合函数取一阶.}
+相位耦合函数 $\Gamma(\theta_j-\theta_i)$ 取其傅里叶展开的一阶项
+$\sin(\theta_j-\theta_i)$。这保证解析可解性，代价是\emph{只保留 $1{:}1$ 锁定}，
+高阶 $p{:}q$ 锁定被排除（\cref{sec:pulse} 单独处理）。
+
+三步都成立时，得到受迫 Kuramoto 模型；三步之外的现象不在本章解释范围内。
+
+%-----------------------------------------------------------------------
+\section{M0：单振子基线}
+\label{sec:M0}
+
+先解最小模型，目的有二：建立 Arnold tongue 的物理直觉，以及为数值代码提供
+解析金标准。
+
+\subsection{无噪声：Adler 方程}
+
+单个固有频率 $\omega_0$ 的振子受频率 $\Om$、强度 $F$ 的正弦驱动：
+$\dot\theta=\omega_0+F\sin(\Om t-\theta)$。引入相对相位
+$\varphi=\theta-\Om t$ 与去谐 $\Delta=\omega_0-\Om$：
+%
+\begin{equation}\label{eq:adler}
+\keyeq{\dot\varphi=\Delta-F\sin\varphi}
+\end{equation}
+%
+不动点条件 $\sin\varphi^{*}=\Delta/F$ 有解的充要条件是
+%
+\begin{equation}\label{eq:lock}
+|\Delta|\le F
+\qquad\Longleftrightarrow\qquad
+|\Om-\omega_0|\le F .
+\end{equation}
+%
+稳定性要求 $\partial_\varphi\dot\varphi=-F\cos\varphi^{*}<0$，故稳定分支为
+$\varphi^{*}=\arcsin(\Delta/F)\in(-\pi/2,\pi/2)$。
+
+\cref{eq:lock} 即 $1{:}1$ \textbf{Arnold tongue}：在 $(\Om,F)$ 平面上是顶点位于
+$(\omega_0,0)$、边界斜率 $\pm1$ 的楔形区域。物理含义直接：\emph{驱动越强，容许
+的频率失配越大}。这正是经颅交流电刺激（tACS）文献中倒三角示意图的严格
+来源~\citep{Ali2013,Notbohm2016}。
+
+\subsection{加噪声：倾斜洗衣板}
+
+\begin{equation}\label{eq:sde}
+\dd\varphi=(\Delta-F\sin\varphi)\,\dd t+\sqrt{2D}\,\dd W ,
+\end{equation}
+%
+对应势函数 $U(\varphi)=-\Delta\varphi-F\cos\varphi$（验证：
+$-\partial_\varphi U=\Delta-F\sin\varphi$）。零去谐时有\emph{精确闭式解}：
+$\Delta=0$ 时 $P(\varphi)\propto e^{(F/D)\cos\varphi}$，即浓度参数
+$\kappa_{\mathrm{vM}}=F/D$ 的 von Mises 分布，锁相值
+%
+\begin{equation}\label{eq:vonmises}
+\rho\;\equiv\;\bigl|\langle e^{\ii\varphi}\rangle\bigr|
+=\frac{I_1(F/D)}{I_0(F/D)}
+\;\xrightarrow[\;F\ll D\;]{}\;\frac{F}{2D}.
+\end{equation}
+
+\begin{remark}\label{rem:Dposition}
+注意 \cref{eq:vonmises} 的结构：噪声 $D$ 在线性响应阶出现在分母，系数为
+$1/2$。这个位置与 \cref{sec:regimes} 中异质性宽度 $\gamma$ 的位置\emph{完全
+相同}——这为 \cref{sec:noise} 合并二者为 $\geff=\gamma+D$ 提供了第一条独立
+依据。
+\end{remark}
+
+M0 在工程上的用途：\cref{eq:lock} 的边界与 \cref{eq:vonmises} 的
+$I_1/I_0$ 曲线是代码单元测试的硬断言。
+
+%-----------------------------------------------------------------------
+\section{M1：受迫 Kuramoto 模型}
+\label{sec:M1}
+
+\subsection{微观方程}
+
+\begin{equation}\label{eq:micro}
+\dot\theta_i=\omega_i
++\frac{K}{N}\sum_{j=1}^{N}\sin(\theta_j-\theta_i)
++F\sin(\Om t-\theta_i)
++\sqrt{2D}\,\xi_i(t)
+\end{equation}
+%
+各量的生理对应（这一步的明确性决定模型能否与数据对接）见 \cref{tab:params}。
+
+\begin{table}[htbp]
+\centering
+\caption{模型参数与生理/实验量的对应}
+\label{tab:params}
+\small
+\begin{tabularx}{\textwidth}{@{}l l X l@{}}
+\toprule
+符号 & 数学含义 & 生理／实验对应 & 经验来源 \\
+\midrule
+$\wbar$ & $g(\omega)$ 中心 & \textbf{个体 mu 峰频} & 静息 EEG (C3/CP3) + specparam \\
+$\gamma$ & $g(\omega)$ 半宽 & mu 谱峰宽度 & 同上 \\
+$K$ & 内部耦合 & 内源相干性／谱峰高度 & 同上 \\
+$F$ & 外部驱动 & 刺激强度 (mA) 经募集曲线映射 & ITC–强度剂量曲线 \\
+$D$ & 噪声强度 & 感觉运动噪声，\textbf{TS 中升高} & \citet{Gialopsou2025} \\
+$\Om$ & 驱动频率 & \textbf{设备设定，当前固定 $10\,$Hz} & --- \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+固有频率取洛伦兹分布
+%
+\begin{equation}\label{eq:lorentz}
+g(\omega)=\frac{\gamma}{\pi\bigl[(\omega-\wbar)^2+\gamma^2\bigr]} .
+\end{equation}
+%
+选洛伦兹\emph{不是}因为它比高斯更真实，而是因为它使下一步降维\emph{精确}。
+这一选择的代价与检验方式见 \cref{sec:boundary} 第 (3) 条。
+
+\subsection{两个驱动可合并为一个：模型的核心结构}
+
+定义序参量
+%
+\begin{equation}\label{eq:orderparam}
+z=r e^{\ii\psi}=\frac{1}{N}\sum_{j=1}^{N}e^{\ii\theta_j} ,
+\end{equation}
+%
+则 \cref{eq:micro} 中两个驱动项可合并：
+%
+\begin{equation*}
+Kr\sin(\psi-\theta_i)+F\sin(\Om t-\theta_i)
+=\Ima\!\left[\bigl(Kz+Fe^{\ii\Om t}\bigr)e^{-\ii\theta_i}\right],
+\end{equation*}
+%
+即每个振子只感受到\emph{单一等效复驱动场}
+%
+\begin{equation}\label{eq:Hfield}
+\keyeq{H=Kz+Fe^{\ii\Om t}}
+\end{equation}
+
+\noindent\textbf{这是整个模型的物理核心。} 它说明“互同步”与“受迫同步”不是两个
+独立机制，而是同一个驱动场的两个分量，二者在竞争同一个相位。当 $K$ 大时群体
+倾向于锁到自己的集体相位 $\psi$；当 $F$ 大时倾向于锁到外部相位 $\Om t$。
+临床上这意味着：\emph{内源节律强的个体更“顽固”，更难被外部驱动改写}——这条
+定性推论将在 \cref{sec:regimeI} 得到定量形式。
+
+%-----------------------------------------------------------------------
+\section{Ott--Antonsen 精确降维}
+\label{sec:OA}
+
+对形如 $\dot\theta_i=\omega_i+\Ima(He^{-\ii\theta_i})$ 的系统，在洛伦兹分布
+\cref{eq:lorentz} 下、$N\to\infty$、$D=0$ 时，Ott--Antonsen (OA)
+ansatz 精确成立~\citep{Ott2008}，序参量满足
+%
+\begin{equation}\label{eq:oa}
+\dot z=(\ii\wbar-\gamma)z+\tfrac12\bigl(H-H^{*}z^{2}\bigr).
+\end{equation}
+
+\paragraph{自检.}
+取 $H=Kz$（无外驱动），得
+$\dot z=(\ii\wbar-\gamma)z+\frac{K}{2}z(1-|z|^2)$。在 $\wbar=0$、$z=r$ 实数时
+$\dot r=-\gamma r+\frac{K}{2}r(1-r^2)$，稳态 $r_0=\sqrt{1-2\gamma/K}$，临界耦合
+$\Kc=2\gamma$。而经典 Kuramoto 结果 $\Kc=2/[\pi g(\wbar)]$ 对洛伦兹
+$g(\wbar)=1/(\pi\gamma)$ 给出 $\Kc=2\gamma$——\emph{一致}。
+
+代入 \cref{eq:Hfield} 并转入旋转参考系 $w=ze^{-\ii\Om t}$（完整代数见
+\cref{app:rotating}）：
+%
+\begin{equation}\label{eq:rot}
+\keyeq{\dot w=(\ii\Delta-\gamma)w+\frac{K}{2}\bigl(w-|w|^2w\bigr)
+       +\frac{F}{2}\bigl(1-w^2\bigr)},
+\qquad \Delta\equiv\wbar-\Om .
+\end{equation}
+
+\noindent\textbf{无穷维系统精确降为二维 ODE。} 这不是近似，而是洛伦兹分布下的
+严格结果。工程意义：二维参数扫描（$200\times200$ 网格）从数小时降到数秒，参数
+拟合从不可行变为可行。\citet{Childs2008} 已给出该系统的完整分岔结构，包括
+Hopf、鞍结、Takens--Bogdanov 分岔的精确位置，并指出其相图与弱非线性受迫
+van der Pol 振子高度相似。
+
+%-----------------------------------------------------------------------
+\section{极坐标形式与不动点}
+\label{sec:polar}
+
+令 $w=\rho e^{\ii\Phi}$，分离 \cref{eq:rot} 的实虚部（推导见
+\cref{app:polar}）：
+%
+\begin{subequations}\label{eq:polar}
+\begin{align}
+\dot\rho &= -\gamma\rho+\frac{K}{2}\rho(1-\rho^2)
+            +\frac{F}{2}(1-\rho^2)\cos\Phi , \label{eq:polar-a}\\[2pt]
+\dot\Phi &= \Delta-\frac{F}{2}\left(\rho+\frac{1}{\rho}\right)\sin\Phi .
+            \label{eq:polar-b}
+\end{align}
+\end{subequations}
+%
+$\rho$ 是旋转系中的序参量模，即\emph{与刺激的相位锁定程度}，直接对应实验中的
+试次间相干（inter-trial coherence, ITC）；$\Phi$ 是群体相对刺激的相位滞后。
+
+\subsection{三个极限检验（代码必须硬断言）}
+\label{sec:limits}
+
+\paragraph{(i) $F=0$（无刺激）.}
+$\dot\rho=\rho\bigl[\frac{K}{2}-\gamma-\frac{K}{2}\rho^2\bigr]$，故
+%
+\begin{equation}\label{eq:rho0}
+\rho_0=\sqrt{1-\frac{2\gamma}{K}}\quad(K>\Kc),
+\qquad \Kc=2\gamma .
+\end{equation}
+
+\paragraph{(ii) $K=0,\ \Delta=0$（纯受迫）.}
+由 \cref{eq:polar-b} 得 $\sin\Phi=0\Rightarrow\Phi=0$；代入 \cref{eq:polar-a}：
+$\frac{F}{2}\rho^2+\gamma\rho-\frac{F}{2}=0$，取正根
+%
+\begin{equation}\label{eq:pureforced}
+\keyeq{\rho^{*}=\frac{\sqrt{\gamma^2+F^2}-\gamma}{F}}
+\end{equation}
+%
+两端渐近：$F\ll\gamma$ 时 $\rho^{*}\to F/(2\gamma)$（\emph{线性}）；
+$F\gg\gamma$ 时 $\rho^{*}\to1$（\emph{饱和}）。
+
+\begin{remark}[第一个零参数形状预测]\label{rem:ITC}
+\cref{eq:pureforced} 可直接对照真实数据。\citet{Morera2026} 测得 ITC 峰值随
+刺激强度（$3.5$–$7\,$mA）单调上升，且相关强度在 TS 组与对照组间无差异；而
+$3.5$–$7\,$mA 全部位于阈下／近阈（该研究报告运动阈值均值：对照
+$7.68\,$mA，TS $8.03\,$mA），即处在 \cref{eq:pureforced} 的\emph{线性段}。
+模型在此区间预测线性，与观测符合，且这条曲线是标定 $F(I)$ 映射的唯一入口。
+\end{remark}
+
+\paragraph{(iii) $\gamma\to0,\ K\to0$} 应退回 M0 的 Adler 方程 \cref{eq:adler}。
+
+%-----------------------------------------------------------------------
+\section{主方程：锁定态的隐式解}
+\label{sec:mainEq}
+
+锁定态即 \cref{eq:polar} 的不动点。由两式分别解出
+%
+\begin{equation}\label{eq:sincos}
+\sin\Phi=\frac{2\Delta\rho}{F(1+\rho^2)},
+\qquad
+\cos\Phi=\frac{\rho\bigl[2\gamma-K(1-\rho^2)\bigr]}{F(1-\rho^2)} .
+\end{equation}
+%
+利用 $\sin^2\Phi+\cos^2\Phi=1$ 消去 $\Phi$：
+%
+\begin{equation}\label{eq:main}
+\keyeq{\frac{4\Delta^2\rho^2}{(1+\rho^2)^2}
+      +\frac{\rho^2\bigl[2\gamma-K(1-\rho^2)\bigr]^2}{(1-\rho^2)^2}=F^2}
+\end{equation}
+
+\noindent\cref{eq:main} 是本章的\textbf{主方程}。给定 $(\Delta,K,\gamma,F)$ 解出
+$\rho\in(0,1)$ 即得锁定强度。它是高次代数方程，一般需数值求根，但\emph{完全
+无需模拟}。Tongue 边界由 \cref{eq:main} 与 $\partial(\cdot)/\partial\rho=0$
+联立给出。
+
+\begin{remark}[边界类型的警告]\label{rem:boundary}
+\citet{Childs2008} 证明该系统的边界并非处处为鞍结分岔，参数空间中还存在
+Hopf 边界、双稳区与漂移／行波态。数值扫描时\textbf{不可假定边界只有一种
+类型}，需对照其完整相图核对。
+\end{remark}
+
+%-----------------------------------------------------------------------
+\section{两个解析可解区制}
+\label{sec:regimes}
+
+\cref{eq:main} 虽精确但不可读。以下给出两个可解极限，\textbf{并明确各自适用
+域}——混用二者会导致错误结论（见 \cref{rem:nocritdiv}）。
+
+\subsection{区制 I：亚临界弱驱动 $\Rightarrow$ 洛伦兹调谐曲线}
+\label{sec:regimeI}
+
+条件：$K<\Kc$（静息态未自发同步，$\rho_0=0$）且 $\rho\ll1$。此时
+$(1\pm\rho^2)^2\to1$、$K(1-\rho^2)\to K$，\cref{eq:main} 化为
+$\rho^2\bigl[4\Delta^2+(2\gamma-K)^2\bigr]=F^2$。定义
+%
+\begin{equation*}
+A\;\equiv\;2\gamma-K\;>\;0 ,
+\end{equation*}
+%
+得
+%
+\begin{equation}\label{eq:regimeI}
+\keyeq{\rho(\Delta)=\frac{F}{\sqrt{A^2+4\Delta^2}}}
+\end{equation}
+%
+功率形式为标准洛伦兹型：
+%
+\begin{equation}\label{eq:power}
+\rho^2(\Delta)=\frac{F^2}{A^2+4\Delta^2} .
+\end{equation}
+%
+由此\emph{三个量同时读出}：
+%
+\begin{equation}\label{eq:three}
+\Ostar=\wbar ,
+\qquad
+W=\frac{A}{2}=\gamma-\frac{K}{2} ,
+\qquad
+\rho_{\max}=\frac{F}{A}=\frac{F}{2\gamma-K} ,
+\end{equation}
+%
+其中 $W$ 为\emph{功率曲线的半高半宽}（等价于 $\rho$ 的 $1/\sqrt2$ 半宽）。
+归一化调谐曲线：
+%
+\begin{equation}\label{eq:normtune}
+\frac{\rho(\Delta)}{\rho(0)}=\frac{1}{\sqrt{1+(\Delta/W)^2}} .
+\end{equation}
+
+\subsubsection{一条守恒关系}
+
+$\gamma$ 与 $K$ 同时决定宽度与高度，且方向一致：$W\propto A$ 而
+$\rho_{\max}\propto1/A$，故
+%
+\begin{equation}\label{eq:conserv}
+\keyeq{W\cdot\rho_{\max}=\frac{F}{2}=\text{const}}
+\end{equation}
+
+\noindent\cref{eq:conserv} 表明：\textbf{调谐窗口宽度与疗效天花板成反比，二者
+之积只由刺激强度决定。} 临床含义清晰而非平凡：
+%
+\begin{itemize}[leftmargin=2em,itemsep=2pt]
+\item \textbf{窄而高的 mu 峰个体（小 $A$）}：疗效天花板高，但频率窗口窄——
+      \emph{最需要个体化}。
+\item \textbf{宽而平的个体（大 $A$）}：对频率不敏感，固定 $10\,$Hz 已足够，但
+      天花板低。
+\end{itemize}
+
+这与实测规律逐项对应。\citet{Trajkovic2024} 报告：静息 alpha 曲线的高度预测
+个体 alpha 频率（IAF）刺激下的幅度增强，而曲线越宽，移动内源频率的调制效应
+越大。映射关系为\textbf{峰高 $\leftrightarrow K$，峰宽 $\leftrightarrow\gamma$}。
+该经验规律此前是描述性的；\cref{eq:three,eq:conserv} 给了它一个推导。
+
+\begin{remark}[量化示例]\label{rem:quant}
+某个体 $\wbar=11\,$Hz，$W=0.5\,$Hz。固定 $10\,$Hz 时 $\Delta=1\,$Hz：
+%
+\begin{equation*}
+\frac{\rho}{\rho_{\max}}=\frac{1}{\sqrt{1+(1/0.5)^2}}=\frac{1}{\sqrt5}=0.45 ,
+\end{equation*}
+%
+即\emph{损失 $55\%$ 的可达带动量}。这是本课题摘要中应出现的数字量级。
+\end{remark}
+
+\paragraph{适用域声明.}
+区制 I 要求 $F\ll A$（由 $\rho\ll1$ 在 $\Delta=0$ 处推出）。$K\to\Kc$ 时
+$A\to0$，线性化失效，必须回到 \cref{eq:main}。
+
+\begin{remark}[一个需要诚实交代的张力]\label{rem:tension}
+$K<\Kc$ 时 mean-field 给出 $\rho_0=0$，即静息态无 mu 同步——这与“静息 mu
+节律确实存在”矛盾。三种可能的和解：(a) 观测到的静息 mu 功率来自有限尺度
+涨落（$\rho_0\sim N^{-1/2}$）；(b) 真实 mu 是间歇性爆发，系统在临界两侧
+往复；(c) 系统实际处于超临界。\textbf{这一张力不应掩盖，它恰好指向
+区制 II。}
+\end{remark}
+
+\subsection{区制 II：超临界 $\Rightarrow$ Adler 楔形与真阈值}
+\label{sec:regimeII}
+
+条件：$K>\Kc$，静息态已自发同步（$\rho_0=\sqrt{1-2\gamma/K}$ 不小），弱驱动
+只作用于集体相位。此时 $\rho\approx\rho_0$ 近似固定，\cref{eq:polar-b}
+退化为 Adler 方程：
+%
+\begin{equation}\label{eq:adlereff}
+\dot\Phi=\Delta-\Feff\sin\Phi ,
+\qquad
+\Feff=\frac{F}{2}\left(\rho_0+\frac{1}{\rho_0}\right).
+\end{equation}
+%
+锁定条件成为\emph{真阈值}：
+%
+\begin{equation}\label{eq:threshold}
+\keyeq{|\Delta|\le\frac{F}{2}\left(\rho_0+\frac{1}{\rho_0}\right)}
+\end{equation}
+
+两个区制的定性差别是本章最重要的可判伪对比，汇总于 \cref{tab:regimes}。
+
+\begin{table}[htbp]
+\centering
+\caption{两个区制的可判伪对比}
+\label{tab:regimes}
+\small
+\begin{tabularx}{\textwidth}{@{}l X X@{}}
+\toprule
+ & 区制 I（亚临界） & 区制 II（超临界） \\
+\midrule
+静息态        & 未同步，$\rho_0=0$        & 自发同步，$\rho_0>0$ \\
+调谐曲线      & 光滑洛伦兹，\textbf{无阈值} & 楔形，\textbf{有硬阈值} \\
+剂量--反应    & 渐变                      & 窗口内有效／窗口外近乎为零 \\
+个体化收益    & 渐进改善                  & \textbf{窗口外为全无效} \\
+群体应答分布  & 单峰连续                  & \textbf{双峰} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\cref{eq:threshold} 给出应答者／非应答者二分的一个干净机制：若静息感觉运动
+mu 处于超临界（mu 的爆发式特征部分支持如此），则 $|\wbar_i-10\,\mathrm{Hz}|$
+超出该窗口的个体本质上得不到任何带动效应。由此得到一条明确的、区分两区制的
+经验预测：
+%
+\begin{quote}
+应答者与非应答者在 $|\wbar_i-10\,\mathrm{Hz}|$ 上的差异应呈\emph{阈值型}
+（区制 II）而非\emph{平滑单调型}（区制 I）。
+\end{quote}
+%
+试验实测的活跃组抽动频率降幅 $-15.6\pm36.6\,\TPM$（标准差是均值的两倍以上）
+以及 $59\%$ 的应答率~\citep{Maiquez2023}——这种方差远大于均值的分布形态，与
+双峰混合更相容，是支持区制 II 的间接证据。第~4 章将用虚拟队列定量检验。
+
+\paragraph{适用域声明.}
+\cref{eq:threshold} 要求 $\rho_0$ 不小。$\rho_0\to0$（即 $K\to\Kc^{+}$）时
+$\Feff\to\infty$，这是 $\rho$ 固定近似失效的\emph{伪发散}。
+
+\subsection{临界邻域：必须数值处理}
+\label{sec:critical}
+
+\begin{remark}[不存在“临界处最易带动”的简单结论]\label{rem:nocritdiv}
+$|K-\Kc|\lesssim F$ 时两个近似均失效。此区域的特征是：锁相范围变宽
+（\cref{eq:threshold} 中 $\Feff$ 增大），但达成的 $\rho$ 变小
+（\cref{eq:regimeI} 中 $\rho_{\max}$ 随 $A\to0$ 的行为被非线性截断）——两个
+效应\emph{方向相反}。因此必须直接数值求解 \cref{eq:main}。决定疗效的量
+始终是 $\rho^{*}(\Om)$，“是否锁定”只是次级特征。
+\end{remark}
+
+%-----------------------------------------------------------------------
+\section{无量纲化：物理只有三个参数}
+\label{sec:nondim}
+
+\begin{equation}\label{eq:nondim}
+\kappa=\frac{K}{2\geff},
+\qquad
+f=\frac{F}{2\geff},
+\qquad
+\delta=\frac{\Delta}{\geff} .
+\end{equation}
+%
+主方程 \cref{eq:main} 变为
+%
+\begin{equation}\label{eq:nondimmain}
+\frac{\delta^2\rho^2}{(1+\rho^2)^2}
++\frac{\rho^2\bigl[1-\kappa(1-\rho^2)\bigr]^2}{(1-\rho^2)^2}=f^2 ,
+\end{equation}
+%
+区制 I 的解变为极简形式：
+%
+\begin{equation}\label{eq:nondimI}
+\keyeq{\rho=\frac{f}{\sqrt{(1-\kappa)^2+\delta^2}}},
+\qquad
+\frac{W}{\geff}=1-\kappa .
+\end{equation}
+%
+同步相变位于 $\kappa=1$。整个模型的物理只由 $(\kappa,f,\delta)$ 三个无量纲数
+决定：\textbf{内源相干度、刺激强度、频率失配}。这是本章的最简表述，也是所有
+数值扫描应采用的坐标。
+
+%-----------------------------------------------------------------------
+\section{噪声的处理}
+\label{sec:noise}
+
+\textbf{必须明确交代}：OA 降维在 $D\neq0$ 时\emph{不精确}。三种处理，按严格性
+递增。
+
+\paragraph{(a) 有效展宽（工作模型）.}
+\begin{equation}\label{eq:geff}
+\keyeq{\geff=\gamma+D}
+\end{equation}
+%
+依据有两条独立来源：一是 \cref{rem:Dposition} 指出的线性响应阶位置一致；二是
+临界耦合的精确插值——含噪声 Kuramoto 的非相干态线性稳定性条件为
+$\frac{K}{2}\Rea\int\frac{g(\omega)\,\dd\omega}{D+\ii(\omega-\wbar)}=1$，对
+洛伦兹分布该积分精确等于 $1/(D+\gamma)$，故
+%
+\begin{equation*}
+\Kc=2(\gamma+D)\qquad\text{（精确）},
+\end{equation*}
+%
+详见 \cref{app:noise}。\textbf{适用域：$\rho\ll1$ 的线性响应区}；完全锁定态
+下 \cref{eq:geff} 仅为近似。
+
+\paragraph{(b) 圆累积量截断.}
+保留到二阶累积量，得含噪声严格的四维 ODE~\citep{Tyulkina2018}，用于量化 (a)
+的偏差。
+
+\paragraph{(c) 直接 $N$ 振子 SDE.}
+$N=10^3$–$10^4$，作为最终判据。
+
+\subsection{一个零参数预测}
+\label{sec:quench}
+
+\citet{Gialopsou2025} 报告：TS 组对单脉冲正中神经刺激的试次间变异显著升高，
+但在刺激作用下被\emph{归一化}。
+
+受迫 Kuramoto 天然给出这一结果，\textbf{无需任何拟合}：外部驱动使
+\cref{eq:sde} 的洗衣板势加深，相位分布收窄，$\Var(\rho)$ 必然下降。TS 的高 $D$
+对应静息态高变异；施加 $F$ 后变异被“淬灭”。这是本模型第二个零参数定性预测
+（第一个是 \cref{rem:ITC}），也是模型可信度的即时来源。
+
+%-----------------------------------------------------------------------
+\section{最优频率的精确位置}
+\label{sec:optfreq}
+
+由 \cref{sec:mainEq}，\cref{eq:main} 中 $\Delta$ 仅以 $\Delta^2$ 出现，故
+$\rho^{*}$ 是 $\Delta$ 的偶函数：
+%
+\begin{equation}\label{eq:optfreq}
+\keyeq{\Ostar=\wbar}
+\qquad\text{（对称 } g \text{、频率平坦传输下\emph{精确}成立）}
+\end{equation}
+%
+偏移只能来自频率依赖的传输函数 $\Xi(\Om)$。设
+$\rho=F_0\Xi(\Om)/\sqrt{A^2+4(\wbar-\Om)^2}$，令
+$\dd\ln\rho/\dd\Om=0$ 并对小偏移线性化（推导见 \cref{app:offset}）：
+%
+\begin{equation}\label{eq:offset}
+\Ostar=\wbar+\frac{A^2}{4}\cdot\frac{\Xi'}{\Xi}\bigg|_{\wbar} .
+\end{equation}
+%
+低通传输（$\Xi'<0$）使最优频率\emph{下移}，且偏移量按调谐宽度的\emph{平方}
+缩放。
+
+\begin{remark}[一个有实用价值的正面结论]\label{rem:offsetsmall}
+数值代入（一阶低通、转折频率 $25\,$Hz；$W$ 取 $0.5$–$2\,$Hz）：偏移量为
+$0.003$–$0.06\,$Hz，\emph{远小于} EEG 峰频估计精度（典型 $\pm0.2$–$0.5\,$Hz）。
+因此开环生物标记算法可直接取 $\Ostar_i=\hat{\wbar}_i$，\textbf{无需模型修正
+项}。第~3 章的算法设计以此为依据。
+\end{remark}
+
+%-----------------------------------------------------------------------
+\section{脉冲驱动与高阶锁定结构}
+\label{sec:pulse}
+
+设备输出为脉冲串而非正弦波。理想脉冲串的傅里叶展开（$\Om=2\pi/T$）：
+%
+\begin{equation}\label{eq:pulse}
+F_p\sum_{n}\delta(t-nT)
+=\frac{F_p}{T}\left[1+2\sum_{m=1}^{\infty}\cos(m\Om t)\right].
+\end{equation}
+
+\paragraph{次谐波驱动 tongue.}
+第 $m$ 次谐波在 $m\Om\approx\wbar$ 时可 $1{:}1$ 锁定，即在 $\Om\approx\wbar/m$
+处出现附加 tongue。例如 $5\,$Hz 脉冲串的二次谐波可锁定 $10\,$Hz mu。这
+\emph{不需要}超出 \cref{sec:reduction} 三步约化的任何假设，是脉冲驱动的直接
+后果。
+
+\paragraph{高阶 $p{:}q$ tongue.}
+需要非正弦相位耦合函数或振幅动力学（Stuart--Landau），超出本章约化范围，
+列为第~6 章展望。
+
+\subsection{一个判据及其局限}
+\label{sec:subharm}
+
+线性时不变系统受 $\Om$ 驱动只能输出 $m\Om$，\textbf{无法输出 $\Om/2$}。因此
+真次谐波响应是非线性锁定的\emph{充分}判据，可原则上区分“真带动”与“诱发反应
+线性叠加”——后者正是 \citet{Houlgreave2022} 对 $12\,$Hz 条件的结论：
+$20\,$Hz 刺激产生了 beta 波段的真正带动，而 $12\,$Hz 的响应主要归因于节律性
+感觉诱发电位。
+
+\citet{Morera2026} 的时频分析显示 $10\,$Hz 刺激下 $5\,$Hz 与 $10\,$Hz 功率
+同时上升，且上升与 MNS 起始同时发生。
+
+\begin{remark}[对该观测的诚实评估：先验解释为起始瞬变]\label{rem:onset}
+该实验采用 $1\,$秒脉冲串 $+\,5\,$秒间隔；$1\,$秒矩形窗的频谱宽度约 $1\,$Hz，
+而\emph{串起始的宽带瞬变在连续小波变换中必然表现为低频功率上升，包括
+$5\,$Hz 附近}。原文“与起始同时发生”的措辞本身即指向起始瞬变。判据在理论上
+有效，但该具体观测的先验解释是 onset transient。若要真正检验，需要：
+(i) 剔除起始 $300\,$ms 后分析稳态段；(ii) 采用连续长时程刺激而非短串；
+(iii) 检验相位一致性而非仅功率。\textbf{本条列为附录中的候选实验设计
+（\cref{app:subharm}），不作为主预测。}
+\end{remark}
+
+%-----------------------------------------------------------------------
+\section{观测模型：从 $\rho$ 到可测量}
+\label{sec:observation}
+
+模型的经济性在于三条观测链路共用同一个 $\rho$：
+
+\begin{table}[htbp]
+\centering
+\caption{三条观测链路}
+\label{tab:obs}
+\small
+\begin{tabularx}{\textwidth}{@{}l l X@{}}
+\toprule
+观测量 & 模型对应 & 数据来源 \\
+\midrule
+试次间相干 ITC & $\rho$ & \citet{Morera2026}; \citet{Houlgreave2022} \\
+诱发 mu 功率   & $\propto\rho^2$ & \citet{Houlgreave2022} \\
+抽动频率 \TPM  & \cref{eq:lambda} & \citet{Maiquez2023}; \citet{Iverson2023a} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{机制推导}
+\label{sec:mechanism}
+
+设运动“就绪度” $m(t)$ 为零均值、方差 $\sigma_m^2$ 的平稳高斯过程（纹状体噪声
+驱动，对应 TS 中抑制性中间神经元减少导致 CSTC 环路噪声增高的病理生理
+假设~\citep{Albin2006}）。$m(t)$ 越过阈值 $\Theta$ 即触发抽动。由 Rice 越阈
+公式，高阈值下越阈率
+%
+\begin{equation}\label{eq:rice}
+\lambda=\nu_0\exp\!\left(-\frac{\Theta^2}{2\sigma_m^2}\right),
+\qquad
+\nu_0=\frac{1}{2\pi}\frac{\sigma_{\dot m}}{\sigma_m} .
+\end{equation}
+%
+\cref{hyp:H2} 的具体形式为：mu 相干抬高有效阈值，
+%
+\begin{equation}\label{eq:thetaeff}
+\Thf=\Theta_0+a\rho .
+\end{equation}
+%
+代入 \cref{eq:rice}（展开见 \cref{app:rice}）并\emph{保留 $\rho$ 的一阶项}，
+即得唯象形式，且系数有了明确出处：
+%
+\begin{equation}\label{eq:lambda}
+\keyeq{\lambda=\lambda_0e^{-\beta\rho}},
+\qquad
+\beta=\frac{a\Theta_0}{\sigma_m^2} .
+\end{equation}
+
+\begin{remark}[两条链路的统一]\label{rem:unify}
+\cref{eq:lambda} 的唯象形式与 \cref{eq:rice}--\cref{eq:thetaeff} 的机制形式
+\emph{不是并列的两个选项，而是同一推导的一阶截断与完整形式}。被丢弃的
+$\rho^2$ 项意味着真实依赖略\emph{陡于}指数——这是一条可检验的二阶偏差。
+
+同时注意 $\beta\propto1/\sigma_m^2$：\emph{噪声越大，门控效率越低}。TS 的高
+噪声一方面通过 $D$ 压低 $\rho$，另一方面通过 $\sigma_m$ 压低 $\beta$，
+\textbf{两条路径同向削弱疗效}。这是模型对“为何 TS 反应异质性大”的一个结构性
+解释。
+\end{remark}
+
+\subsection{疗效函数}
+\label{sec:efficacy}
+
+\begin{equation}\label{eq:efficacy}
+E(\Om)=1-\frac{\langle\lambda\rangle_{\mathrm{stim}}}
+                {\langle\lambda\rangle_{\mathrm{base}}}
+      =1-\exp\bigl\{-\beta\bigl[\rho^{*}(\Om)-\rho_0\bigr]\bigr\} .
+\end{equation}
+%
+区制 I（$\rho_0=0$）下代入 \cref{eq:regimeI}，得\textbf{完整的个体调谐曲线
+闭式解}：
+%
+\begin{equation}\label{eq:Ei}
+\keyeq{E_i(\Om)=1-\exp\!\left[-\frac{\beta_iF_i}
+       {\sqrt{A_i^2+4(\wbar_i-\Om)^2}}\right]}
+\end{equation}
+%
+\cref{eq:Ei} 是第~3 章个体化算法的目标函数，也是第~4 章虚拟队列的前向模型。
+作为 Cox 点过程的条件强度，它可直接对真实 \TPM{} 计数数据做极大似然估计。
+
+\subsection{一条衍生预测}
+\label{sec:phasegate}
+
+若 \cref{eq:thetaeff} 中保留相位依赖，
+$\Thf=\Theta_0+a\rho+b\rho\cos\varphi_{\mathrm{gate}}(t)$，则
+%
+\begin{quote}
+\textbf{预测}：抽动发生概率在 mu 周期内呈相位调制。
+\end{quote}
+%
+这可用带时间戳的抽动记录直接检验，并构成“相位锁定闭环刺激”（比调频率更进
+一步）的理论依据。
+
+%-----------------------------------------------------------------------
+\section{慢变量层：online 与 offline 必须分离}
+\label{sec:slow}
+
+一个不可回避的逻辑区分：
+%
+\begin{itemize}[leftmargin=2em,itemsep=2pt]
+\item \textbf{Online 效应}（刺激期间 \TPM{} 下降）：由 $\rho(t)$ 直接给出，
+      即时、不外溢。与 \citet{Iverson2023a} 报告 MNS 益处在刺激结束后不
+      持续一致。
+\item \textbf{Offline 效应}（4 周后 \YGTSS{} 降 $7.13$ 分）：\emph{带动本身
+      无法解释}，因为 $\rho$ 在刺激停止后立即回落。必须引入慢变量。
+\end{itemize}
+
+最简 Hebbian 形式（时标 $\tau_p\sim$ 天）：
+%
+\begin{equation}\label{eq:hebb}
+\tau_p\frac{\dd K}{\dd t}=-(K-K_0)+\eta\,\overline{\rho}
+\qquad\text{或}\qquad
+\tau_p\frac{\dd D}{\dd t}=-(D-D_0)-\eta'\overline{\rho} ,
+\end{equation}
+%
+其中 $\overline{\rho}$ 为单次 session 的时间平均。累积刺激缓慢提升 $\kappa$
+（或降低 $D$），进而提升基线 $\rho_0$，降低基线抽动率。
+
+\subsection{统一两组看似矛盾的实验结果}
+\label{sec:unifyexp}
+
+因 offline 效应对 $\overline{\rho}$ 做\emph{时间积分}，而 $\overline{\rho}$
+本身按 \cref{eq:normtune} 随 $|\Delta|$ 衰减，积分放大了去谐惩罚：
+%
+\begin{quote}
+\textbf{预测}：offline 效应的频率选择性\emph{强于} online 效应。
+\end{quote}
+%
+这解释了为何 \citet{Iverson2023a} 的单次交叉实验看不到节律／非节律差异
+（online，选择性弱），而 \citet{Maiquez2023} 的 4 周方案能与假刺激显著分离
+（offline，选择性强）。\textbf{模型给出了这两组结果的统一解释}，这是第~5 章
+的独立结果小节。
+
+\subsection{适应项}
+\label{sec:adapt}
+
+\citet{Morera2026} 显示 ITC 增幅在刺激期内衰减，且 TS 组的衰减大于对照组。
+建模为
+%
+\begin{equation}\label{eq:adapt}
+F(t)=F_0\bigl[a_\infty+(1-a_\infty)e^{-t/T_a}\bigr],
+\end{equation}
+%
+TS 组 $T_a$ 更短。这是可直接拟合的两参数动态特征，同时为设备采用
+$2\,$min on $/\,1\,$min off 占空比提供了理论依据（允许 $F$ 在间歇期恢复）。
+
+%-----------------------------------------------------------------------
+\section{参数与可辨识性}
+\label{sec:identifiability}
+
+表面上每个体有 9 个参数
+$\{\wbar,\gamma,K,D,F,\beta,\lambda_0,T_a,a_\infty\}$。但在区制 I 下，由
+\cref{eq:Ei} 可见\textbf{只有三个可辨识组合}：
+%
+\begin{equation}\label{eq:ident}
+\keyeq{\Theta_i=\bigl\{\;\wbar_i,\quad
+       A_i\equiv2\gamma_{\mathrm{eff},i}-K_i,\quad
+       B_i\equiv\beta_iF_i\;\bigr\}}
+\end{equation}
+%
+因为 $K$ 与 $\geff$ 只以差值 $A$ 出现，$F$ 与 $\beta$ 只以乘积 $B$ 出现
+（Fisher 信息矩阵的零方向见 \cref{app:ident}）。
+
+\begin{remark}[决定项目可行性的结果]\label{rem:identgood}
+这一结果\emph{消除了}对 $K$--$F$ 共线性的担忧：不是“报告参数不可辨识”，而是
+模型在该区制下本质上只有三个自由度。这使个体拟合从 9 参数问题降为 3 参数
+问题——在每人仅有数个 session 数据的临床现实下，这是决定项目可行性的关键。
+\end{remark}
+
+三个参数的经验先验：
+
+\begin{table}[htbp]
+\centering
+\caption{三个可辨识参数的经验先验来源}
+\label{tab:priors}
+\small
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+参数 & 先验来源 \\
+\midrule
+$\wbar_i$ & 峰值 alpha 频率（PAF）发育轨迹：13 岁约 $9.7\,$Hz，渐近
+            $10.1\,$Hz~\citep{Cellier2022}；成人感觉运动 mu 去同步峰
+            $10$–$12\,$Hz~\citep{Berchicci2011}；个体标准差约 $1\,$Hz \\
+$A_i$     & specparam 提取的 mu 峰宽（典型 FWHM $1.5$–$3\,$Hz）；TS 组 $D$ 更高 \\
+$B_i$     & 由 \cref{eq:pureforced} 标定 $F(I)$；$\beta$ 由 \TPM{} 剂量反应拟合 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{remark}[方法学要求，非可选]\label{rem:fooof}
+$\wbar_i$ 必须用 specparam/FOOOF~\citep{Donoghue2020} 剥离 $1/f$ 非周期成分后
+再取峰。\citet{Adelhofer2021} 已证明 TS 在感觉运动整合中的无标度／非周期活动
+升高，直接取 FFT 峰会引入\emph{与组别相关}的系统偏差——而该偏差恰好污染
+本模型最核心的参数。
+\end{remark}
+
+%-----------------------------------------------------------------------
+\section{可判伪预测清单}
+\label{sec:predictions}
+
+\begin{table}[htbp]
+\centering
+\caption{十条可判伪预测及其当前证据状态}
+\label{tab:predictions}
+\footnotesize
+\begin{tabularx}{\textwidth}{@{}l X l X l@{}}
+\toprule
+\# & 预测 & 依据 & 检验途径 & 状态 \\
+\midrule
+P1 & 最优频率 $=$ 个体 mu 峰频，偏移 $<0.1\,$Hz
+   & \cref{eq:optfreq,eq:offset} & 闭环调频实验 & 待检验 \\
+P2 & 调谐宽度随强度展开 $\Rightarrow$ 低强度方案最需个体化
+   & tongue 几何 & $2\times2$（强度$\times$调频） & 待检验 \\
+P3 & 窄高峰个体：高天花板 $+$ 强频率敏感；$W\rho_{\max}$ 守恒
+   & \cref{eq:three,eq:conserv} & 静息谱形 $\to$ 疗效相关 & \textbf{部分支持} \\
+P4 & 年龄 $\to$ mu 频率 $\to$ 去谐 $\to$ 疗效
+   & \cref{eq:normtune} & 试验已发表年龄数据 & 待检验 \\
+P5 & 若超临界，应答／非应答呈\emph{阈值型}而非平滑型
+   & \cref{eq:threshold} & $|\wbar_i-10|$ vs 应答 & \textbf{间接支持} \\
+P6 & ITC--强度曲线低强度段线性、高强度饱和
+   & \cref{eq:pureforced} & --- & \textbf{已支持（零参数）} \\
+P7 & 刺激淬灭试次间变异
+   & \cref{eq:sde} 势加深 & --- & \textbf{已支持（零参数）} \\
+P8 & offline 频率选择性 $>$ online
+   & \cref{eq:hebb} 积分 & 统一两组实验 & 待检验 \\
+P9 & 抽动概率呈 mu 相位调制
+   & \cref{eq:thetaeff} 相位项 & 抽动时间戳 & 待检验 \\
+P10 & 真次谐波响应可判别带动 vs 诱发叠加
+   & \cref{eq:pulse} & 需专门实验设计 & \textbf{降级，附录} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+P6、P7 已被现有数据支持且\emph{无自由参数}——这是模型的即时可信度锚点。
+P2、P3、P5、P8 是最具原创性的四条。
+
+%-----------------------------------------------------------------------
+\section{模型边界：明确列出它解释不了什么}
+\label{sec:boundary}
+
+学术诚实是本章能否被接受的分水岭。以下每一条都应写入正文而非藏在讨论末尾。
+
+\begin{enumerate}[leftmargin=2.2em,itemsep=4pt]
+
+\item \textbf{非节律 $\approx$ 节律（最强反证）.}
+模型中非节律驱动对应宽带随机输入，$\rho$ 提升应远小于节律驱动。
+\citet{Iverson2023a} 报告节律与非节律 $12\,$Hz MNS 对抽动频率、强度、冲动的
+改善无显著差异；\citet{Houlgreave2025} 进一步发现节律与非节律刺激的紧张性
+神经调质效应（GABA 下降）亦无显著差异。\emph{本模型无法解释两者等效。}
+应明确写为带动假设的边界，剩余部分需归因于其他机制（同步放电占用皮层资源以
+降低感觉运动噪声；或 GABA 介导的非频率特异性效应）。
+
+\item \textbf{相位约化丢弃振幅动力学.}
+真实 mu 是爆发式而非持续极限环。burst 统计、间歇性，以及 \cref{rem:tension}
+中 $\rho_0=0$ 的张力，都需要升级到 Stuart--Landau 或含亚临界 Hopf 的模型。
+
+\item \textbf{洛伦兹分布是数学便利，非生理事实.}
+真实 mu 谱峰有界（$\omega>0$）、与 theta/beta 重叠、且不对称。检验方式：用
+高斯或偏态 $g(\omega)$ 做 $N$ 振子模拟，量化 \cref{eq:regimeI} 的偏差。预期
+偏差主要影响 tongue 尾部而非峰位（因 \cref{eq:optfreq} 只依赖对称性）。
+
+\item \textbf{单群 mean-field 无空间结构.}
+不含 CSTC 环路拓扑、不含皮层--基底神经节传导延迟环。P10 若成立可能需双群
+模型才能定量。
+
+\item \textbf{安慰剂无法排除.}
+\citet{Iverson2023a} 明确指出其数据不能排除安慰剂效应。模型能提供的是
+\emph{安慰剂无法模仿的频率依赖模式}（P1--P3、P5）——这正是本模型的临床
+价值：它把“是否有效”的问题转化为“疗效是否按预测的方式随频率变化”，后者
+对安慰剂免疫。
+
+\item \textbf{外周抖动可忽略（负面结果）.}
+$\Xi_{\mathrm{jitter}}=e^{-\sigma_\tau^2\Om^2/2}$，代入 $\sigma_\tau\le3\,$ms、
+$\Om=2\pi\cdot10\,$rad/s：衰减约 $1.8\%$。需 $\sigma_\tau\gtrsim10.6\,$ms 才
+产生 $20\%$ 效应，外周传入通路不现实（推导见 \cref{app:jitter}）。
+\emph{结论：低频段外周路径是“干净”的传输通道，该机制仅在 gamma 波段方案中
+需考虑。}
+
+\end{enumerate}
+
+%-----------------------------------------------------------------------
+\section*{本章小结}
+\addcontentsline{toc}{section}{本章小结}
+\label{sec:summary}
+
+从三步约化出发，经 OA 精确降维，得到主方程 \cref{eq:main}。两个可解区制给出
+核心结果：
+%
+\begin{align*}
+\text{区制 I：}\quad &\rho=\frac{f}{\sqrt{(1-\kappa)^2+\delta^2}},
+  \qquad W\cdot\rho_{\max}=\frac{F}{2};\\
+\text{区制 II：}\quad &|\Delta|\le\frac{F}{2}\left(\rho_0+\frac{1}{\rho_0}\right).
+\end{align*}
+%
+经观测模型 \cref{eq:lambda} 转为疗效函数 \cref{eq:Ei}，参数压缩为三个可辨识量
+\cref{eq:ident}，产出十条可判伪预测——其中两条已被现有数据零参数支持。
+
+模型的核心论断可以用一句话概括：
+
+\begin{quote}
+\textbf{该试验已在 Arnold tongue 的振幅轴上实施了个体化（按运动阈值设定
+$120\%$ 强度），却在频率轴上采用固定值；而由 \cref{eq:three} 与
+\cref{eq:conserv}，频率轴恰是锁定条件中更敏感的那一维。}
+\end{quote}

@@ -1,0 +1,120 @@
+%=======================================================================
+%  受迫耦合振子模型 —— 第 2 章 + 附录 A
+%  编译： xelatex main  →  bibtex main  →  xelatex main  →  xelatex main
+%  或：   latexmk -xelatex main.tex
+%
+%  说明：本文件为驱动文件。正文内容在
+%          chapter2_body.tex   （第 2 章）
+%          appendixA_body.tex  （附录 A）
+%  可直接把这两个文件 \input 进你自己的手稿，无需本驱动文件。
+%=======================================================================
+\documentclass[11pt,a4paper]{report}
+
+%-----------------------------------------------------------------------
+% 中文支持：双路径。有 ctex 用 ctex（推荐，断行/标点更规范）；
+% 否则回落到 fontspec + Noto CJK，保证最小环境也能编译。
+%-----------------------------------------------------------------------
+\newif\ifhasctex
+\IfFileExists{ctex.sty}{\hasctextrue}{\hasctexfalse}
+
+\ifhasctex
+  \usepackage[UTF8]{ctex}
+\else
+  \usepackage{fontspec}
+  \IfFontExistsTF{Noto Serif CJK SC}
+    {\setmainfont{Noto Serif CJK SC}}
+    {\IfFontExistsTF{WenQuanYi Zen Hei}
+      {\setmainfont{WenQuanYi Zen Hei}}
+      {}}
+  % 最小环境下手工设置 CJK 断行惩罚，避免中文不换行溢出版面
+  \XeTeXlinebreaklocale "zh"
+  \XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+\fi
+
+%-----------------------------------------------------------------------
+% 数学与排版
+%-----------------------------------------------------------------------
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+\usepackage{geometry}
+\geometry{margin=2.6cm}
+\usepackage{booktabs,tabularx,array,multirow}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{caption}
+\captionsetup{font=small,labelsep=quad}
+\usepackage{microtype}
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+\usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=teal!60!black,
+            urlcolor=magenta!60!black,breaklinks=true]{hyperref}
+\usepackage[nameinlink]{cleveref}
+
+%-----------------------------------------------------------------------
+% 公式按章编号 → (2.1), (2.2), ... ; 附录 → (A.1), ...
+%-----------------------------------------------------------------------
+\numberwithin{equation}{chapter}
+\allowdisplaybreaks[2]
+
+%-----------------------------------------------------------------------
+% cleveref 中文名称
+%-----------------------------------------------------------------------
+\crefname{equation}{式}{式}
+\Crefname{equation}{式}{式}
+\crefname{chapter}{第}{第}
+\crefname{section}{}{}
+\crefname{table}{表}{表}
+\crefname{appendix}{附录}{附录}
+\crefname{remark}{说明}{说明}
+\Crefname{remark}{说明}{说明}
+\crefname{hypo}{命题}{命题}
+\Crefname{hypo}{命题}{命题}
+
+%-----------------------------------------------------------------------
+% 记号宏（集中定义，便于全局替换）
+%-----------------------------------------------------------------------
+\newcommand{\wbar}{\bar{\omega}}          % 个体 mu 峰频
+\newcommand{\geff}{\gamma_{\mathrm{eff}}} % 有效展宽
+\newcommand{\Feff}{F_{\mathrm{eff}}}
+\newcommand{\Om}{\Omega}
+\newcommand{\Ostar}{\Om^{*}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Rea}{\operatorname{Re}}
+\newcommand{\Ima}{\operatorname{Im}}
+\newcommand{\Kc}{K_{\mathrm{c}}}
+\newcommand{\Thf}{\Theta_{\mathrm{eff}}}
+% 以下两个宏在正文与数学模式中都会用到，故用 \ensuremath 包裹
+\newcommand{\TPM}{\ensuremath{\mathrm{TPM}}}
+\newcommand{\YGTSS}{\ensuremath{\mathrm{YGTSS}}}
+
+% 强调框（用于核心公式）
+\newcommand{\keyeq}[1]{\boxed{\,#1\,}}
+
+% 命题环境
+\newtheorem{hypo}{命题}
+\newtheorem{remark}{说明}[chapter]
+\theoremstyle{definition}
+
+%-----------------------------------------------------------------------
+\title{\bfseries 固定频率正中神经刺激的受迫耦合振子理论\\[4pt]
+       \large ——从节律带动假设到个体化最优频率}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+% 使首个 \chapter 编号为 2
+\setcounter{chapter}{1}
+
+\input{chapter2_body}
+
+\appendix
+\input{appendixA_body}
+
+\bibliography{refs}
+
+\end{document}
